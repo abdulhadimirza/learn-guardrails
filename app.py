@@ -1,6 +1,10 @@
 import time
 
 import streamlit as st
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
+
+load_dotenv()
 
 st.set_page_config(
     page_title="Guardrails & Model Testbed",
@@ -17,7 +21,7 @@ with st.sidebar:
     
     model = st.selectbox(
         "Model",
-        ["Hardcoded"],
+        ["Llama 3.1 8B"],
         key="model_select"
     )
     
@@ -88,14 +92,24 @@ if st.session_state.is_processing:
     # Process and display assistant response
     with st.chat_message("assistant"):
         with st.spinner("Processing pipeline..."):
-            def stream_response():
-                response = f"This is a simulated response from {model}. Your request has been processed successfully."
-                for word in response.split():
-                    yield word + " "
-                    time.sleep(0.05)
-                    
-            response_text = st.write_stream(stream_response())
-            
+            if model == "Llama 3.1 8B":
+                llm = ChatGroq(model_name="llama-3.1-8b-instant")
+                lc_messages = [(msg["role"], msg["content"]) for msg in st.session_state.messages]
+                
+                def stream_llm():
+                    buffer = ""
+                    for chunk in llm.stream(lc_messages):
+                        if chunk.content:
+                            buffer += chunk.content
+                            while " " in buffer:
+                                word, buffer = buffer.split(" ", 1)
+                                yield word + " "
+                                time.sleep(0.05)
+                    if buffer:
+                        yield buffer
+                            
+                response_text = st.write_stream(stream_llm())
+    
     # Add assistant response to state
     st.session_state.messages.append({"role": "assistant", "content": response_text})
     st.session_state.is_processing = False
