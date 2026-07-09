@@ -3,6 +3,10 @@ import time
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
+from nemoguardrails import RailsConfig, LLMRails
+from nemoguardrails.integrations.langchain.llm_adapter import LangChainLLMAdapter 
+import asyncio
+import concurrent.futures
 
 load_dotenv()
 
@@ -11,6 +15,15 @@ st.set_page_config(
     page_icon=":material/shield:",
     layout="wide",
 )
+
+@st.cache_resource
+def get_rails():
+    config = RailsConfig.from_path("config")
+    raw_llm = ChatGroq(model_name="llama-3.1-8b-instant")
+    llm = LangChainLLMAdapter(llm=raw_llm)
+    return LLMRails(config, llm=llm)
+
+rails = get_rails()
 
 st.title("AI Testbed", anchor=False)
 st.caption("Test environment for AI models, guardrails, jailbreak protection, and intent checks.")
@@ -93,22 +106,28 @@ if st.session_state.is_processing:
     with st.chat_message("assistant"):
         with st.spinner("Processing pipeline..."):
             if model == "Llama 3.1 8B":
-                llm = ChatGroq(model_name="llama-3.1-8b-instant")
-                lc_messages = [(msg["role"], msg["content"]) for msg in st.session_state.messages]
+                messages_copy = [dict(msg) for msg in st.session_state.messages]
+                
+                def run_rails(msgs):
+                    async def _coro():
+                        return await rails.generate_async(messages=msgs)
+                    return asyncio.run(_coro())
+                
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    res = executor.submit(run_rails, messages_copy).result()
+                    
+                response_text = res["content"] if isinstance(res, dict) else str(res)
                 
                 def stream_llm():
-                    buffer = ""
-                    for chunk in llm.stream(lc_messages):
-                        if chunk.content:
-                            buffer += chunk.content
-                            while " " in buffer:
-                                word, buffer = buffer.split(" ", 1)
-                                yield word + " "
-                                time.sleep(0.05)
+                    buffer = response_text
+                    while " " in buffer:
+                        word, buffer = buffer.split(" ", 1)
+                        yield word + " "
+                        time.sleep(0.05)
                     if buffer:
                         yield buffer
                             
-                response_text = st.write_stream(stream_llm())
+                st.write_stream(stream_llm())
     
     # Add assistant response to state
     st.session_state.messages.append({"role": "assistant", "content": response_text})

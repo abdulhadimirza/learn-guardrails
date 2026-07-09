@@ -1,4 +1,5 @@
 .agents/
+temp_repo/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,17 @@
+define user ask off topic
+  "tell me a joke"
+  "what is the capital of france"
+  "write me a poem"
+  "what is 2 plus 2"
+  "what should I eat for dinner"
+  "who won the game yesterday"
+  "recommend a movie"
+  "what is the weather like"
+
+define bot refuse off topic
+  "I'm an Enterprise IT Assistant focused on Kubernetes, Intel hardware, and networking. I can't help with that — but ask me anything technical!"
+
+define flow handle off topic
+  user ask off topic
+  bot refuse off topic
+  stop

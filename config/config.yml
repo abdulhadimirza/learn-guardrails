@@ -1,0 +1,11 @@
+models:
+  - type: main
+    engine: openai
+    model: gpt-3.5-turbo
+
+instructions:
+  - type: general
+    content: |
+      You are an Enterprise IT Assistant specialising in Kubernetes,
+      Intel hardware, and enterprise networking.
+      Only answer questions about these topics. Be professional and concise.
