@@ -107,7 +107,7 @@ if st.session_state.is_processing:
         with st.spinner("Processing pipeline..."):
             if model == "Llama 3.1 8B":
                 messages_copy = [dict(msg) for msg in st.session_state.messages]
-                
+
                 def run_rails(msgs):
                     async def _coro():
                         return await rails.generate_async(messages=msgs)
@@ -116,7 +116,7 @@ if st.session_state.is_processing:
                 with concurrent.futures.ThreadPoolExecutor() as executor:
                     res = executor.submit(run_rails, messages_copy).result()
                     
-                response_text = res["content"] if isinstance(res, dict) else str(res)
+                response_text = res["content"]
                 
                 def stream_llm():
                     buffer = response_text
