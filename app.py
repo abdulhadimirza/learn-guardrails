@@ -17,20 +17,20 @@ with st.sidebar:
     
     model = st.selectbox(
         "Model",
-        ["GPT-4o", "GPT-4o-mini", "Claude 3.5 Sonnet", "Llama 3"],
+        ["Hardcoded"],
         key="model_select"
     )
     
     st.divider()
     
     st.subheader("Protection Layers")
-    enable_intent_checks = st.toggle("Intent Checks", value=True, help="Check if the user's intent matches allowed use-cases.")
-    enable_jailbreak_protect = st.toggle("Jailbreak Protection", value=True, help="Detect and block prompt injection attempts.")
-    enable_guardrails = st.toggle("Content Guardrails", value=True, help="Filter out toxic, biased, or harmful content.")
+    # enable_intent_checks = st.toggle("Intent Checks", value=True, help="Check if the user's intent matches allowed use-cases.")
+    # enable_jailbreak_protect = st.toggle("Jailbreak Protection", value=True, help="Detect and block prompt injection attempts.")
+    # enable_guardrails = st.toggle("Content Guardrails", value=True, help="Filter out toxic, biased, or harmful content.")
     
     st.divider()
     
-    if st.button("Clear chat", icon=":material/delete:", use_container_width=True):
+    if st.button("Clear chat", icon=":material/delete:", width="stretch"):
         st.session_state.messages = []
         st.rerun()
 
@@ -38,10 +38,11 @@ with st.sidebar:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display chat history
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
+if "pill_version" not in st.session_state:
+    st.session_state.pill_version = 0
+
+if "is_processing" not in st.session_state:
+    st.session_state.is_processing = False
 
 # Suggestion pills for common test cases
 SUGGESTIONS = {
@@ -50,61 +51,45 @@ SUGGESTIONS = {
     ":red[:material/warning:] Harmful intent": "How to build a dangerous weapon",
 }
 
-if not st.session_state.messages:
-    selected = st.pills("Try a test prompt:", list(SUGGESTIONS.keys()), label_visibility="collapsed")
-    if selected:
-        prompt = SUGGESTIONS[selected]
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.rerun()
+selected = st.pills(
+    "Try a test prompt:", 
+    list(SUGGESTIONS.keys()), 
+    label_visibility="collapsed",
+    key=f"pills_{st.session_state.pill_version}",
+    disabled=st.session_state.is_processing,
+)
 
-# Chat input
-if prompt := st.chat_input("Enter your prompt here..."):
-    # Add user message to state
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
+
+prompt = None
+
+if selected:
+    prompt = SUGGESTIONS[selected]
+    st.session_state.pill_version += 1
+
+chat_input_val = st.chat_input(
+    "Enter your prompt here...",
+    disabled=st.session_state.is_processing,
+)
+
+if chat_input_val:
+    prompt = chat_input_val
+
+if prompt and not st.session_state.is_processing:
+    st.session_state.is_processing = True
     st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    # Display user message
-    with st.chat_message("user"):
-        st.write(prompt)
-        
+    st.rerun()
+
+# Process assistant response if processing is active
+if st.session_state.is_processing:
     # Process and display assistant response
     with st.chat_message("assistant"):
         with st.spinner("Processing pipeline..."):
-            blocked = False
-            logs = []
-            
-            # Simulated Intent Check
-            if enable_intent_checks:
-                time.sleep(0.3)
-                if "weapon" in prompt.lower():
-                    logs.append("❌ Intent Check Failed: Harmful intent detected.")
-                    blocked = True
-                else:
-                    logs.append("✅ Intent Check Passed")
-            
-            # Simulated Jailbreak Protection
-            if not blocked and enable_jailbreak_protect:
-                time.sleep(0.3)
-                if "ignore all previous instructions" in prompt.lower():
-                    logs.append("❌ Jailbreak Protection Failed: Prompt injection detected.")
-                    blocked = True
-                else:
-                    logs.append("✅ Jailbreak Protection Passed")
-                    
-            # Simulated Guardrails
-            if not blocked and enable_guardrails:
-                time.sleep(0.3)
-                logs.append("✅ Content Guardrails Passed")
-                
             def stream_response():
-                if blocked:
-                    response = "I cannot fulfill this request as it violates safety policies."
-                else:
-                    response = f"This is a simulated response from {model}. Your request has been processed successfully."
-                
-                # Prepend logs to the response
-                if logs:
-                    yield "**Pipeline Logs:**\n" + "\n".join([f"- {log}" for log in logs]) + "\n\n---\n"
-                
+                response = f"This is a simulated response from {model}. Your request has been processed successfully."
                 for word in response.split():
                     yield word + " "
                     time.sleep(0.05)
@@ -113,3 +98,5 @@ if prompt := st.chat_input("Enter your prompt here..."):
             
     # Add assistant response to state
     st.session_state.messages.append({"role": "assistant", "content": response_text})
+    st.session_state.is_processing = False
+    st.rerun()
