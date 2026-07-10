@@ -17,13 +17,13 @@ st.set_page_config(
 )
 
 @st.cache_resource
-def get_rails():
+def get_rails() -> LLMRails:
     config = RailsConfig.from_path("config")
-    raw_llm = ChatGroq(model_name="llama-3.1-8b-instant")
-    llm = LangChainLLMAdapter(llm=raw_llm)
-    return LLMRails(config, llm=llm)
+    rails = LLMRails(config)
+    return rails
 
 rails = get_rails()
+
 
 st.title("AI Testbed", anchor=False)
 st.caption("Test environment for AI models, guardrails, jailbreak protection, and intent checks.")
@@ -31,12 +31,6 @@ st.caption("Test environment for AI models, guardrails, jailbreak protection, an
 # Sidebar for configuration
 with st.sidebar:
     st.header("Settings")
-    
-    model = st.selectbox(
-        "Model",
-        ["Llama 3.1 8B"],
-        key="model_select"
-    )
     
     st.divider()
     
@@ -105,29 +99,30 @@ if st.session_state.is_processing:
     # Process and display assistant response
     with st.chat_message("assistant"):
         with st.spinner("Processing pipeline..."):
-            if model == "Llama 3.1 8B":
-                messages_copy = [dict(msg) for msg in st.session_state.messages]
+            # Pass only the latest user message to avoid re-triggering old flows in Colang 2.0
+            last_user_message = [msg for msg in st.session_state.messages if msg["role"] == "user"][-1]
+            messages_copy = [dict(last_user_message)]
 
-                def run_rails(msgs):
-                    async def _coro():
-                        return await rails.generate_async(messages=msgs)
-                    return asyncio.run(_coro())
+            def run_rails(msgs):
+                async def _coro():
+                    return await rails.generate_async(messages=msgs)
+                return asyncio.run(_coro())
+            
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                res = executor.submit(run_rails, messages_copy).result()
                 
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    res = executor.submit(run_rails, messages_copy).result()
-                    
-                response_text = res["content"]
-                
-                def stream_llm():
-                    buffer = response_text
-                    while " " in buffer:
-                        word, buffer = buffer.split(" ", 1)
-                        yield word + " "
-                        time.sleep(0.05)
-                    if buffer:
-                        yield buffer
-                            
-                st.write_stream(stream_llm())
+            response_text = res["content"]
+            
+            def stream_llm():
+                buffer = response_text
+                while " " in buffer:
+                    word, buffer = buffer.split(" ", 1)
+                    yield word + " "
+                    time.sleep(0.05)
+                if buffer:
+                    yield buffer
+                        
+            st.write_stream(stream_llm())
     
     # Add assistant response to state
     st.session_state.messages.append({"role": "assistant", "content": response_text})
