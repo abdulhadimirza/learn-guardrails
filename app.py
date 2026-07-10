@@ -7,6 +7,7 @@ from nemoguardrails import RailsConfig, LLMRails
 from nemoguardrails.integrations.langchain.llm_adapter import LangChainLLMAdapter 
 import asyncio
 import concurrent.futures
+from nemoguardrails.rails.llm.llmrails import State
 
 load_dotenv()
 
@@ -99,13 +100,12 @@ if st.session_state.is_processing:
     # Process and display assistant response
     with st.chat_message("assistant"):
         with st.spinner("Processing pipeline..."):
-            # Pass only the latest user message to avoid re-triggering old flows in Colang 2.0
-            last_user_message = [msg for msg in st.session_state.messages if msg["role"] == "user"][-1]
-            messages_copy = [dict(last_user_message)]
+            messages_copy = [msg for msg in st.session_state.messages]
 
             def run_rails(msgs):
                 async def _coro():
-                    return await rails.generate_async(messages=msgs)
+                    res = await rails.generate_async(messages=msgs)
+                    return res
                 return asyncio.run(_coro())
             
             with concurrent.futures.ThreadPoolExecutor() as executor:

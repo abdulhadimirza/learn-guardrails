@@ -1,16 +1,4 @@
-import core
-import llm
-
-flow main
-  activate llm continuation
-  activate greeting
-
-flow greeting
-  user expressed greeting
+define flow
+  user express greeting
+  # Respond in a very formal way and introduce yourself.
   bot express greeting
-
-flow user expressed greeting
-  user said "hi" or user said "hello"
-
-flow bot express greeting
-  bot say "Hello world!"

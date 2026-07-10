@@ -1,4 +1,3 @@
-colang_version: 2.x
 models:
   - type: main
     engine: openai
@@ -15,12 +14,12 @@ instructions:
       Only answer questions about these topics. Be professional and concise.
 
 #rails:
-  #input:
-    #parallel: false
-    #flows:
-      #- check input for pii
-      #- detect urgency
-  #output:
-    #parallel: false
-    #flows:
-      #- sanitize bot response
+#input:
+#parallel: false
+#flows:
+#- check input for pii
+#- detect urgency
+#output:
+#parallel: false
+#flows:
+#- sanitize bot response
