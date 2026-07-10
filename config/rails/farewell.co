@@ -1,0 +1,15 @@
+define user express farewell
+  "bye"
+  "goodbye"
+  "see you"
+  "thanks bye"
+  "that is all"
+  "I am done"
+  "talk later"
+
+define bot express farewell
+  "Goodbye! Feel free to return whenever you have more enterprise IT questions. Have a great day!"
+
+define flow farewell
+  user express farewell
+  bot express farewell

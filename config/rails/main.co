@@ -1,4 +1,0 @@
-define flow
-  user express greeting
-  # Respond in a very formal way and introduce yourself.
-  bot express greeting

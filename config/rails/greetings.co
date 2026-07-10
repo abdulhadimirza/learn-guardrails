@@ -1,0 +1,14 @@
+define user express greeting
+  "hello"
+  "hi"
+  "hey"
+  "good morning"
+  "what's up"
+  "howdy"
+
+define bot express greeting
+  "Hello! I'm your Enterprise IT Assistant. I specialise in Kubernetes, Intel hardware, and enterprise networking. What can I help you with today?"
+
+define flow greeting
+  user express greeting
+  bot express greeting

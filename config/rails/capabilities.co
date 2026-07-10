@@ -1,0 +1,15 @@
+define user ask capabilities
+  "what can you do"
+  "what do you know"
+  "help"
+  "what are you"
+  "what topics do you cover"
+  "what can I ask you"
+  "what are your capabilities"
+
+define bot explain capabilities
+  "I'm an Enterprise AI Assistant with deep expertise in: Kubernetes (deployment, scaling, networking, operators), Intel Hardware (CPUs, FPGAs, SRIOV, NICs), Enterprise Networking (SDN, VLANs, BGP, routing). Ask me anything in these areas!"
+
+define flow capabilities
+  user ask capabilities
+  bot explain capabilities

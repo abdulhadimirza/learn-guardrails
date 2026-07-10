@@ -6,13 +6,6 @@ models:
     parameters:
       base_url: https://api.groq.com/openai/v1
 
-instructions:
-  - type: general
-    content: |
-      You are an Enterprise IT Assistant specialising in Kubernetes,
-      Intel hardware, and enterprise networking.
-      Only answer questions about these topics. Be professional and concise.
-
 #rails:
 #input:
 #parallel: false

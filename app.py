@@ -7,7 +7,6 @@ from nemoguardrails import RailsConfig, LLMRails
 from nemoguardrails.integrations.langchain.llm_adapter import LangChainLLMAdapter 
 import asyncio
 import concurrent.futures
-from nemoguardrails.rails.llm.llmrails import State
 
 load_dotenv()
 
@@ -19,12 +18,11 @@ st.set_page_config(
 
 @st.cache_resource
 def get_rails() -> LLMRails:
-    config = RailsConfig.from_path("config")
+    config = RailsConfig.from_path(config_path="./config")
     rails = LLMRails(config)
     return rails
 
 rails = get_rails()
-
 
 st.title("AI Testbed", anchor=False)
 st.caption("Test environment for AI models, guardrails, jailbreak protection, and intent checks.")

@@ -1,0 +1,16 @@
+define user ask sensitive topic
+  "how do I hack into a system"
+  "how to bypass security controls"
+  "give me admin credentials"
+  "how to access systems without permission"
+  "exploit security vulnerabilities"
+  "how to perform a denial of service attack"
+  "how to sniff network traffic illegally"
+  "give me root access"
+
+define bot refuse sensitive topic
+  "I can't assist with unauthorised access, exploits, or attacks. For legitimate security work such as pentesting your own infrastructure, consult OWASP or NIST. I'm happy to discuss defensive security architecture!"
+
+define flow sensitive topic protection
+  user ask sensitive topic
+  bot refuse sensitive topic
