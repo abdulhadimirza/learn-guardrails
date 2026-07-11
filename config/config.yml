@@ -11,9 +11,25 @@ rails:
     flows:
       - self check input
       - mask sensitive data on input
+  output:
+    flows:
+      - self check output
+      - mask sensitive data on output
   config:
     sensitive_data_detection:
       input:
+        entities:
+          - EMAIL_ADDRESS
+          - PHONE_NUMBER
+          - PERSON
+          - CREDIT_CARD
+          - IP_ADDRESS
+          - CRYPTO
+          - IBAN_CODE
+          - US_SSN
+          - US_PASSPORT
+          - US_DRIVER_LICENSE
+      output:
         entities:
           - EMAIL_ADDRESS
           - PHONE_NUMBER
