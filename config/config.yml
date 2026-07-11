@@ -6,13 +6,8 @@ models:
     parameters:
       base_url: https://api.groq.com/openai/v1
 
-#rails:
-#input:
-#parallel: false
-#flows:
-#- check input for pii
-#- detect urgency
-#output:
-#parallel: false
-#flows:
-#- sanitize bot response
+rails:
+  input:
+    flows:
+      - self check input
+
