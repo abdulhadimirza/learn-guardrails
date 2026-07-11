@@ -10,5 +10,18 @@ rails:
   input:
     flows:
       - self check input
-      - jailbreak detection heuristics
-
+      - mask sensitive data on input
+  config:
+    sensitive_data_detection:
+      input:
+        entities:
+          - EMAIL_ADDRESS
+          - PHONE_NUMBER
+          - PERSON
+          - CREDIT_CARD
+          - IP_ADDRESS
+          - CRYPTO
+          - IBAN_CODE
+          - US_SSN
+          - US_PASSPORT
+          - US_DRIVER_LICENSE
