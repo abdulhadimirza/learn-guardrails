@@ -10,4 +10,5 @@ rails:
   input:
     flows:
       - self check input
+      - jailbreak detection heuristics
 
