@@ -14,6 +14,7 @@ rails:
   output:
     flows:
       - self check output
+      - self check facts
       - mask sensitive data on output
   config:
     sensitive_data_detection:
@@ -21,7 +22,6 @@ rails:
         entities:
           - EMAIL_ADDRESS
           - PHONE_NUMBER
-          - PERSON
           - CREDIT_CARD
           - IP_ADDRESS
           - CRYPTO
@@ -33,7 +33,6 @@ rails:
         entities:
           - EMAIL_ADDRESS
           - PHONE_NUMBER
-          - PERSON
           - CREDIT_CARD
           - IP_ADDRESS
           - CRYPTO
