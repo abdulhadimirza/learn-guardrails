@@ -5,17 +5,36 @@ models:
     api_key_env_var: GROQ_API_KEY
     parameters:
       base_url: https://api.groq.com/openai/v1
+      tools:
+        - type: function
+          function:
+            name: restart_pod
+            description: Restarts a specific pod in a Kubernetes cluster.
+            parameters:
+              type: object
+              properties:
+                pod_name:
+                  type: string
+                  description: The name of the pod to restart.
+                namespace:
+                  type: string
+                  description: The namespace of the pod.
+                  enum: ["default", "production", "staging"]
+              required: ["pod_name", "namespace"]
 
 rails:
-  input:
+  # input:
+  # flows:
+  # - self check input
+  # - mask sensitive data on input
+  # output:
+  # flows:
+  # - self check output
+  # - self check facts
+  # - mask sensitive data on output
+  tool_output:
     flows:
-      - self check input
-      - mask sensitive data on input
-  output:
-    flows:
-      - self check output
-      - self check facts
-      - mask sensitive data on output
+      - tool call validation
   config:
     sensitive_data_detection:
       input:

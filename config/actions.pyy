@@ -1,0 +1,11 @@
+from nemoguardrails.actions import action
+
+@action()
+async def restart_pod(pod_name: str, namespace: str) -> str:
+    """Restarts a specific pod in a Kubernetes cluster.
+
+    Args:
+        pod_name: The name of the pod to restart.
+        namespace: The namespace of the pod.
+    """
+    return f"Pod '{pod_name}' in namespace '{namespace}' restarted successfully."
