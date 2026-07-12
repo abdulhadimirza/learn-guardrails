@@ -1,0 +1,20 @@
+define user ask about enterprise tech
+  "how do I configure a kubernetes deployment"
+  "what is the difference between statefulset and deployment"
+  "how does kube-scheduler make decisions"
+  "what is SR-IOV and how does it work with Intel NICs"
+  "how to set up BGP routing in enterprise networking"
+  "how do Persistent Volume Claims work in k8s"
+  "explain ingress path matching exact vs prefix"
+  "how does the node controller monitor node status"
+  "how to scale a deployment with replicas"
+  "what is etcd and why is it important"
+  "how does kube-proxy manage network rules"
+  "what are the ingress path types"
+  "explain daemonset and its use cases"
+  "what is a configmap vs secret"
+  "how to check pod status using kubectl"
+
+define flow answer enterprise tech query
+  user ask about enterprise tech
+  $check_facts = True
